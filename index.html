@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>광주 표준시간 시계</title>
+<title>광주 표준시간</title>
 
 <style>
 
@@ -14,15 +14,22 @@
     box-sizing: border-box;
 }
 
+
 body {
-    background: black;
+
     width: 100vw;
     height: 100vh;
+
+    background: black;
+
     overflow: hidden;
 
     display: flex;
     justify-content: center;
     align-items: center;
+
+    cursor: none;
+
 }
 
 
@@ -32,12 +39,11 @@ body {
 
     font-family: Arial, Helvetica, sans-serif;
 
-    /* 화면 크기에 맞춰 자동 조절 */
-    font-size: clamp(80px, 15vw, 250px);
+    font-size: clamp(70px, 16vw, 260px);
 
     font-weight: 900;
 
-    letter-spacing: 0.08em;
+    letter-spacing: 0.04em;
 
     white-space: nowrap;
 
@@ -46,16 +52,22 @@ body {
 }
 
 
-/* 세로 화면 */
-@media (orientation: portrait) {
+#message {
 
-    #clock {
+    position: fixed;
 
-        font-size: clamp(60px, 13vw, 180px);
+    bottom: 20px;
 
-    }
+    color: white;
+
+    font-size: 18px;
+
+    opacity: 0.5;
+
+    font-family: Arial, sans-serif;
 
 }
+
 
 
 </style>
@@ -71,6 +83,11 @@ body {
 </div>
 
 
+<div id="message">
+화면을 터치하면 전체 화면
+</div>
+
+
 
 <script>
 
@@ -78,41 +95,39 @@ body {
 function updateClock(){
 
 
-    // 현재 시간 가져오기
-
     const now = new Date();
 
 
-    // UTC → 대한민국 표준시(KST)
+    // 대한민국 표준시(KST)
 
     const utc =
     now.getTime()
-    + (now.getTimezoneOffset() * 60000);
+    + now.getTimezoneOffset() * 60000;
 
 
     const korea =
-    new Date(utc + (9 * 60 * 60 * 1000));
+    new Date(utc + 9 * 60 * 60 * 1000);
 
 
 
-    let hour = korea.getHours();
+    let h = korea.getHours();
 
-    let minute = korea.getMinutes();
+    let m = korea.getMinutes();
 
-    let second = korea.getSeconds();
+    let s = korea.getSeconds();
 
 
 
-    hour = String(hour).padStart(2,"0");
+    h = String(h).padStart(2,"0");
 
-    minute = String(minute).padStart(2,"0");
+    m = String(m).padStart(2,"0");
 
-    second = String(second).padStart(2,"0");
+    s = String(s).padStart(2,"0");
 
 
 
     document.getElementById("clock").innerText =
-    `${hour}:${minute}:${second}`;
+    `${h}:${m}:${s}`;
 
 
 }
@@ -126,26 +141,69 @@ updateClock();
 
 
 
-// 화면 자동 꺼짐 방지
+// 화면 터치 → 전체 화면
 
-async function keepScreenOn(){
+document.body.addEventListener("click",()=>{
+
+
+    if(document.documentElement.requestFullscreen){
+
+        document.documentElement.requestFullscreen();
+
+    }
+
+
+    document.getElementById("message").style.display="none";
+
+
+});
+
+
+
+
+
+// 화면 꺼짐 방지
+
+async function keepAwake(){
+
 
     try{
 
         await navigator.wakeLock.request("screen");
 
-    }
-
-    catch(error){
-
-        console.log("지원되지 않는 브라우저");
+        console.log("화면 유지 성공");
 
     }
+
+    catch(e){
+
+        console.log("화면 유지 미지원");
+
+    }
+
 
 }
 
 
-keepScreenOn();
+
+keepAwake();
+
+
+
+// 화면이 다시 켜질 때 재요청
+
+document.addEventListener(
+"visibilitychange",
+()=>{
+
+    if(document.visibilityState==="visible"){
+
+        keepAwake();
+
+    }
+
+});
+
 
 
 </script>
