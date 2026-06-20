@@ -14,25 +14,40 @@
     box-sizing: border-box;
 }
 
-
 body {
-
     width: 100vw;
     height: 100vh;
-
     background: black;
-
     overflow: hidden;
 
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
 
     cursor: none;
+}
+
+
+/* 날짜 */
+#date {
+
+    color: white;
+
+    font-family: Arial, Helvetica, sans-serif;
+
+    font-size: clamp(20px, 3vw, 45px);
+
+    font-weight: 600;
+
+    margin-bottom: 20px;
+
+    opacity: 0.9;
 
 }
 
 
+/* 시간 */
 #clock {
 
     color: white;
@@ -47,27 +62,7 @@ body {
 
     white-space: nowrap;
 
-    text-align: center;
-
 }
-
-
-#message {
-
-    position: fixed;
-
-    bottom: 20px;
-
-    color: white;
-
-    font-size: 18px;
-
-    opacity: 0.5;
-
-    font-family: Arial, sans-serif;
-
-}
-
 
 
 </style>
@@ -78,13 +73,13 @@ body {
 <body>
 
 
-<div id="clock">
-00:00:00
+<div id="date">
+2026년 01월 01일
 </div>
 
 
-<div id="message">
-화면을 터치하면 전체 화면
+<div id="clock">
+00:00:00
 </div>
 
 
@@ -111,23 +106,47 @@ function updateClock(){
 
 
     let h = korea.getHours();
-
     let m = korea.getMinutes();
-
     let s = korea.getSeconds();
 
 
 
     h = String(h).padStart(2,"0");
-
     m = String(m).padStart(2,"0");
-
     s = String(s).padStart(2,"0");
 
 
 
     document.getElementById("clock").innerText =
     `${h}:${m}:${s}`;
+
+
+
+    const year = korea.getFullYear();
+
+    const month = korea.getMonth()+1;
+
+    const day = korea.getDate();
+
+
+
+    const days = [
+        "일요일",
+        "월요일",
+        "화요일",
+        "수요일",
+        "목요일",
+        "금요일",
+        "토요일"
+    ];
+
+
+    const week = days[korea.getDay()];
+
+
+
+    document.getElementById("date").innerText =
+    `${year}년 ${String(month).padStart(2,"0")}월 ${String(day).padStart(2,"0")}일 ${week}`;
 
 
 }
@@ -141,10 +160,9 @@ updateClock();
 
 
 
-// 화면 터치 → 전체 화면
+// 전체 화면
 
 document.body.addEventListener("click",()=>{
-
 
     if(document.documentElement.requestFullscreen){
 
@@ -152,12 +170,7 @@ document.body.addEventListener("click",()=>{
 
     }
 
-
-    document.getElementById("message").style.display="none";
-
-
 });
-
 
 
 
@@ -166,44 +179,18 @@ document.body.addEventListener("click",()=>{
 
 async function keepAwake(){
 
-
     try{
 
         await navigator.wakeLock.request("screen");
 
-        console.log("화면 유지 성공");
-
     }
 
-    catch(e){
-
-        console.log("화면 유지 미지원");
-
-    }
-
+    catch(e){}
 
 }
 
 
-
 keepAwake();
-
-
-
-// 화면이 다시 켜질 때 재요청
-
-document.addEventListener(
-"visibilitychange",
-()=>{
-
-    if(document.visibilityState==="visible"){
-
-        keepAwake();
-
-    }
-
-});
-
 
 
 </script>
