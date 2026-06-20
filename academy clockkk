@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>광주 표준시간 시계</title>
+
+<style>
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: black;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+
+#clock {
+
+    color: white;
+
+    font-family: Arial, Helvetica, sans-serif;
+
+    /* 화면 크기에 맞춰 자동 조절 */
+    font-size: clamp(80px, 15vw, 250px);
+
+    font-weight: 900;
+
+    letter-spacing: 0.08em;
+
+    white-space: nowrap;
+
+    text-align: center;
+
+}
+
+
+/* 세로 화면 */
+@media (orientation: portrait) {
+
+    #clock {
+
+        font-size: clamp(60px, 13vw, 180px);
+
+    }
+
+}
+
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<div id="clock">
+00:00:00
+</div>
+
+
+
+<script>
+
+
+function updateClock(){
+
+
+    // 현재 시간 가져오기
+
+    const now = new Date();
+
+
+    // UTC → 대한민국 표준시(KST)
+
+    const utc =
+    now.getTime()
+    + (now.getTimezoneOffset() * 60000);
+
+
+    const korea =
+    new Date(utc + (9 * 60 * 60 * 1000));
+
+
+
+    let hour = korea.getHours();
+
+    let minute = korea.getMinutes();
+
+    let second = korea.getSeconds();
+
+
+
+    hour = String(hour).padStart(2,"0");
+
+    minute = String(minute).padStart(2,"0");
+
+    second = String(second).padStart(2,"0");
+
+
+
+    document.getElementById("clock").innerText =
+    `${hour}:${minute}:${second}`;
+
+
+}
+
+
+
+setInterval(updateClock,1000);
+
+updateClock();
+
+
+
+
+// 화면 자동 꺼짐 방지
+
+async function keepScreenOn(){
+
+    try{
+
+        await navigator.wakeLock.request("screen");
+
+    }
+
+    catch(error){
+
+        console.log("지원되지 않는 브라우저");
+
+    }
+
+}
+
+
+keepScreenOn();
+
+
+</script>
+
+
+</body>
+</html>
